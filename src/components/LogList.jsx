@@ -3,7 +3,7 @@ import React from "react";
 export default function LogList() {
   const logs = [
     { ip: "203.0.113.42", time: "19:22", reason: "다중 접속 탐지", status: "차단됨" },
-    { ip: "192.168.0.14", time: "18:58", reason: "정상", status: "허용" },
+    { ip: "192.168.0.14", time: "18:58", reason: "현재 IP주소", status: "허용" },
     { ip: "91.184.12.7", time: "18:32", reason: "포트스캔 시도", status: "차단됨" },
   ];
 

@@ -1,6 +1,7 @@
 import React from "react";
 import LogList from "../components/LogList.jsx";
 import TrafficCard from "../components/TrafficCard.jsx";
+import IpTable from "../components/IpTable.jsx";
 
 export default function Dashboard() {
   return (
@@ -10,10 +11,8 @@ export default function Dashboard() {
         <TrafficCard title="자동 차단된 IP" value="7개" color="#ff4444" />
         <TrafficCard title="서버 상태" value="정상" color="#00cc66" />
       </div>
-      <div className="logs">
-        <h2>실시간 차단 로그</h2>
-        <LogList />
-      </div>
+      <LogList />
+      <IpTable />
     </div>
   );
 }
