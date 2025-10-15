@@ -1,3 +1,4 @@
+/* src/components/IpTable.css */
 .ip-card {
   background-color: #1e2430;
   border-radius: 12px;
@@ -12,12 +13,12 @@
   margin-bottom: 12px;
 }
 
+/* 입력 폼 */
 .ip-form {
   display: flex;
   gap: 8px;
   margin-bottom: 14px;
 }
-
 .ip-form input,
 .ip-form select {
   flex: 1;
@@ -27,7 +28,6 @@
   padding: 8px 10px;
   color: #fff;
 }
-
 .btn-add {
   background: #007bff;
   border: none;
@@ -37,16 +37,14 @@
   cursor: pointer;
   transition: 0.2s;
 }
-.btn-add:hover {
-  background: #2891ff;
-}
+.btn-add:hover { background: #2891ff; }
 
+/* 필터/검색 */
 .ip-filter {
   display: flex;
   gap: 8px;
   margin-bottom: 10px;
 }
-
 .ip-filter input,
 .ip-filter select {
   flex: 1;
@@ -57,102 +55,33 @@
   color: #fff;
 }
 
-.ip-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
+/* 테이블 */
+.ip-table { width: 100%; border-collapse: collapse; }
 .ip-table th {
-  text-align: left;
-  padding: 10px;
-  border-bottom: 1px solid #2b3444;
-  color: #9bb2d2;
-  font-size: 0.9rem;
+  text-align: left; padding: 10px;
+  border-bottom: 1px solid #2b3444; color: #9bb2d2; font-size: 0.9rem;
 }
-
 .ip-table td {
-  padding: 12px 10px;
-  border-bottom: 1px solid #2b3444;
-  vertical-align: middle;
+  padding: 12px 10px; border-bottom: 1px solid #2b3444; vertical-align: middle;
 }
 
-.ip-table tr:hover {
-  background-color: #252d3a;
-}
+/* 행 간격/강조 */
+.ip-table tr { transition: background-color .15s ease; }
+.ip-table tr:hover { background-color: #252d3a; }
+.blocked-row { background-color: rgba(255, 0, 0, 0.05); }
+.empty { text-align: center; color: #aaa; padding: 16px; }
 
-.blocked-row {
-  background-color: rgba(255, 0, 0, 0.05);
-}
+/* 배지/버튼 */
+.badge { padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; }
+.badge-green { background: rgba(0, 200, 100, 0.15); color: #00cc66; }
+.badge-red { background: rgba(255, 50, 50, 0.15); color: #ff5555; }
 
-.empty {
-  text-align: center;
-  color: #999;
-  padding: 16px;
-}
-
-.badge {
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-}
-.badge-green {
-  background: rgba(0, 200, 100, 0.15);
-  color: #00cc66;
-}
-.badge-red {
-  background: rgba(255, 50, 50, 0.15);
-  color: #ff5555;
-}
-
-.btn-group {
-  display: flex;
-  gap: 6px;
-}
-
-.btn-gray {
-  background: #3a455a;
-  border: none;
-  border-radius: 5px;
-  padding: 6px 10px;
-  cursor: pointer;
-  color: #fff;
-}
-.btn-gray:hover {
-  background: #4c5670;
-}
-
-.btn-green {
-  background: #007a4a;
-  border: none;
-  border-radius: 5px;
-  padding: 6px 10px;
-  cursor: pointer;
-  color: white;
-}
-.btn-green:hover {
-  background: #00985b;
-}
-
-.btn-red {
-  background: #c0392b;
-  border: none;
-  border-radius: 5px;
-  padding: 6px 10px;
-  cursor: pointer;
-  color: white;
-}
-.btn-red:hover {
-  background: #e74c3c;
-}
-
-.btn-delete {
-  background: transparent;
-  border: 1px solid #ff4444;
-  border-radius: 5px;
-  color: #ff7777;
-  padding: 6px 10px;
-  cursor: pointer;
-}
-.btn-delete:hover {
-  background: rgba(255, 50, 50, 0.15);
-}
+.btn-group { display: flex; gap: 6px; }
+.btn-gray  { background:#3a455a; border:none; border-radius:5px; padding:6px 10px; color:#fff; cursor:pointer; }
+.btn-gray:hover { background:#4c5670; }
+.btn-green { background:#007a4a; border:none; border-radius:5px; padding:6px 10px; color:#fff; cursor:pointer; }
+.btn-green:hover { background:#00985b; }
+.btn-red   { background:#c0392b; border:none; border-radius:5px; padding:6px 10px; color:#fff; cursor:pointer; }
+.btn-red:hover   { background:#e74c3c; }
+.btn-delete { background:transparent; border:1px solid #ff4444; border-radius:5px; color:#ff7777; padding:6px 10px; cursor:pointer; }
+.btn-delete:hover { background: rgba(255,50,50,0.15); }
