@@ -1,4 +1,5 @@
-const KEY = "logs:v1";
+// src/lib/logStore.js
+const KEY = "logs:v1"; // [{ id, ip, label, reason, status, at }]
 
 function load() {
   try {
@@ -10,22 +11,15 @@ function load() {
 }
 function save(list) {
   localStorage.setItem(KEY, JSON.stringify(list));
-  try {
-    window.dispatchEvent(new CustomEvent("logsChanged"));
-  } catch {}
+  try { window.dispatchEvent(new CustomEvent("logsChanged")); } catch {}
 }
 
-export function listLogs({ todayOnly=false } = {}) {
-  const all = load();
-  if (!todayOnly) return all.sort((a,b)=>b.at-a.at);
-  const start = new Date(); start.setHours(0,0,0,0);
-  const end = new Date(); end.setHours(23,59,59,999);
-  return all.filter(l => l.at >= start.getTime() && l.at <= end.getTime())
-            .sort((a,b)=>b.at-a.at);
+export function listLogs() {
+  return load();
 }
 
-export function addLog({ ip, reason="", status="allowed", label="" }) {
-  const id = (crypto.randomUUID && crypto.randomUUID()) || String(Date.now()+Math.random());
+export function addLog({ ip, reason = "", status = "info", label = "" }) {
+  const id = (crypto?.randomUUID && crypto.randomUUID()) || String(Date.now() + Math.random());
   const at = Date.now();
   const entry = { id, ip, label, reason, status, at };
   const all = load();
