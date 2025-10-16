@@ -110,7 +110,7 @@ export default function IpTable() {
   function triggerServerAbnormal() {
     const self = findByLabel("내아이피");
     if (!self) {
-      showBanner(" '내IP' 라벨의 규칙이 없습니다. 먼저 내아이피를 등록해 주세요.", "warn");
+      showBanner(" '내IP' 라벨이 없습니다. 먼저 내아이피를 등록해 주세요.", "warn");
       return;
     }
     if (self.status !== "차단") {
@@ -287,7 +287,7 @@ export default function IpTable() {
       </div>
 
       <div style={{ marginTop: 16 }}>
-        <h4>마지막으로 생성된 임시 admin 정보</h4>
+        <h4>마지막으로 생성된 admin 정보</h4>
         {lastAdmin ? (
           <div className="admin-box">
             <div>

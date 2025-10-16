@@ -1,3 +1,4 @@
+// src/pages/Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import LogList from "../components/LogList.jsx";
 import TrafficCard from "../components/TrafficCard.jsx";
@@ -11,25 +12,35 @@ export default function Dashboard() {
   const [serverStatus, setServerStatus] = useState("정상");
 
   const refresh = () => {
-    // 1) 규칙 중 차단 개수 (자동 차단된 IP 카드)
+    // 1) 규칙 중 차단 개수 (자동 차단된 IP)
     const rules = listRules();
-    const blocked = rules.filter(r => r.status === "blocked").length;
-    setAutoBlockedCount(blocked);
+    const blockedCount = rules.filter((r) => r.status === "차단").length;
+    setAutoBlockedCount(blockedCount);
 
-    // 2) 오늘 탐지된 외부 접근 (오늘 날짜의 '차단' 로그 수)
-    const today = listLogs({ todayOnly: true });
-    const todayBlockedCount = today.filter(l => l.status === "blocked").length;
-    setTodayBlocked(todayBlockedCount);
+    // 2) 서버 상태: 라벨이 '내아이피'인 규칙이 차단이면 비정상, 아니면 정상
+    const selfRule = rules.find((r) => (r.label || "") === "내아이피");
+    const status = selfRule && selfRule.status === "차단" ? "비정상" : "정상";
+    setServerStatus(status);
 
-    // 3) 서버 상태 = 오직 'IP 접근 제어' 규칙만 기준 (로그와 무관)
-    setServerStatus(blocked > 0 ? "비정상" : "정상");
+    // 3) 오늘 탐지된 외부 접근: 오늘 날짜 & status === '차단' 인 로그 수
+    const logs = listLogs();
+    const blockedToday = logs.filter((l) => {
+      const d = new Date(l.at);
+      const now = new Date();
+      const sameDay =
+        d.getFullYear() === now.getFullYear() &&
+        d.getMonth() === now.getMonth() &&
+        d.getDate() === now.getDate();
+      return sameDay && l.status === "차단";
+    }).length;
+    setTodayBlocked(blockedToday);
   };
 
   useEffect(() => {
     refresh();
     const h = () => refresh();
     window.addEventListener("ipRulesChanged", h);
-    window.addEventListener("logsChanged", h); // 카드 수치(오늘 탐지된 외부 접근) 갱신용
+    window.addEventListener("logsChanged", h);
     return () => {
       window.removeEventListener("ipRulesChanged", h);
       window.removeEventListener("logsChanged", h);
@@ -44,7 +55,7 @@ export default function Dashboard() {
         <TrafficCard title="서버 상태" value={serverStatus} color={serverStatus === "정상" ? "#00cc66" : "#ff4444"} />
       </div>
 
-      {/* ✅ 위치 변경: IP 접근 제어를 위로, 최근 활동 로그를 아래로 */}
+      {/* IP 접근 제어 + 최근 로그 */}
       <IpTable />
       <LogList />
     </div>

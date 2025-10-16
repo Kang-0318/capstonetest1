@@ -19,37 +19,41 @@ export default function LogList() {
   }, []);
 
   const fmt = (ts) => {
-    const d = new Date(ts);
-    const dstr = d.toLocaleDateString();
-    const tstr = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    return `${dstr} ${tstr}`;
+    try {
+      return new Date(ts).toLocaleString();
+    } catch {
+      return "-";
+    }
   };
 
   return (
-    <div className="card" style={{ marginTop: 20 }}>
-      <div className="card-header" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+    <div className="panel">
+      <div className="panel-header">
         <h3>최근 활동 로그</h3>
-        <button onClick={clearLogs} style={{background:'transparent',border:'1px solid #444',borderRadius:6,color:'#ccc',padding:'6px 10px'}}>로그 비우기</button>
+        <button className="btn-gray" onClick={() => { clearLogs(); load(); }}>로그 초기화</button>
       </div>
-      <table className="table">
+      <table className="log-table">
         <thead>
           <tr>
-            <th>IP 주소</th>
-            <th>시간</th>
-            <th>사유</th>
+            <th>IP</th>
+            <th>시각</th>
+            <th>이벤트</th>
             <th>상태</th>
           </tr>
         </thead>
         <tbody>
-          {logs.length === 0 ? (
-            <tr><td colSpan={4} style={{textAlign:'center',padding:16,color:'#aaa'}}>기록이 없습니다.</td></tr>
-          ) : logs.map(l => (
+          {logs.length === 0 && (
+            <tr>
+              <td colSpan={4} style={{ textAlign: "center", opacity: 0.6 }}>로그가 없습니다.</td>
+            </tr>
+          )}
+          {logs.map((l) => (
             <tr key={l.id}>
-              <td>{l.ip}</td>
+              <td>{l.ip || "-"}</td>
               <td>{fmt(l.at)}</td>
               <td>{l.reason || "-"}</td>
-              <td style={{ color: l.status === "blocked" ? "#ff6666" : "#00cc66" }}>
-                {l.status === "blocked" ? "차단" : "허용"}
+              <td style={{ color: l.status === "차단" ? "#ff6666" : "#00cc66" }}>
+                {l.status === "차단" ? "차단" : l.status === "허용" ? "허용" : l.status}
               </td>
             </tr>
           ))}
