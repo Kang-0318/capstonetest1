@@ -138,6 +138,7 @@ export default function IpTable() {
     // 상단 배너 + 모달
     showBanner(` 서버 비정상 외부IP 접근 감지 — 어드민 암호/IP 갱신됨 (임시 IP: ${ip})`, "error", 8000);
     setModalOpen(true);
+
   }
 
   // '내아이피 등록' 버튼 동작
@@ -322,6 +323,9 @@ function LogBox() {
   function load() {
     setLogs(listLogs().slice(-8).reverse());
   }
+
+  
+
   return (
     <div style={{ maxHeight: 180, overflow: "auto", background: "#0f1720", padding: 10, borderRadius: 8 }}>
       {logs.length === 0 && <div style={{ opacity: 0.6 }}>로그가 없습니다.</div>}
