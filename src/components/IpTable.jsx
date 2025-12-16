@@ -14,6 +14,12 @@ export default function IpTable() {
   const [q, setQ] = useState("");
   const [myIp, setMyIp] = useState("");
 
+  // 서버(리눅스) 네트워크/접속 정보
+  const [serverIps, setServerIps] = useState([]);
+  const [connectionsRaw, setConnectionsRaw] = useState("");
+  const [serverLoading, setServerLoading] = useState(false);
+  const [serverError, setServerError] = useState("");
+
   // 상단 고정 배너
   const [banner, setBanner] = useState({ open: false, text: "", level: "info" });
 
@@ -159,6 +165,34 @@ export default function IpTable() {
     showBanner(" 내아이피가 등록되었습니다.", "success");
   }
 
+  // 리눅스 서버에서 IP/네트워크 상태 + 접속 IP 로그 조회
+  async function fetchServerInfo() {
+    // TODO: 실제 리눅스 서버 주소로 변경 (예: http://192.168.0.10:4000)
+    const BASE = "http://localhost:4000";
+    setServerLoading(true);
+    setServerError("");
+    try {
+      const ipRes = await fetch(`${BASE}/api/server-ip`);
+      if (!ipRes.ok) throw new Error("서버 IP 조회 실패");
+      const ipData = await ipRes.json();
+      setServerIps(Array.isArray(ipData) ? ipData : []);
+
+      const connRes = await fetch(`${BASE}/api/connections`);
+      if (!connRes.ok) throw new Error("접속 정보 조회 실패");
+      const connData = await connRes.json();
+      setConnectionsRaw(connData.raw || "");
+
+      showBanner(" 리눅스 서버 네트워크/접속 정보가 갱신되었습니다.", "success", 4000);
+    } catch (e) {
+      console.error(e);
+      const msg = e.message || "서버 정보 조회 중 오류가 발생했습니다.";
+      setServerError(msg);
+      showBanner(` 서버 정보 조회 실패: ${msg}`, "error", 6000);
+    } finally {
+      setServerLoading(false);
+    }
+  }
+
   return (
     <div className="ip-card">
       {/* 상단 고정 배너 */}
@@ -233,9 +267,70 @@ export default function IpTable() {
         </select>
         <input placeholder="검색 (IP 또는 라벨)" value={q} onChange={(e) => setQ(e.target.value)} />
         <div style={{ flex: 1 }} />
+        <button className="btn-gray" type="button" onClick={fetchServerInfo} disabled={serverLoading}>
+          {serverLoading ? "서버 정보 불러오는 중..." : "리눅스 서버 상태 조회"}
+        </button>
         <button className="btn-red" onClick={triggerServerAbnormal}>
           서버 상태 → 비정상(테스트)
         </button>
+      </div>
+
+      {/* 리눅스 서버 네트워크 상태 / 접속 IP 로그 표시 영역 */}
+      <div style={{ marginTop: 16 }}>
+        <h4>서버 네트워크 상태 (리눅스 ip addr)</h4>
+        {serverError && (
+          <div style={{ color: "#f97373", marginBottom: 8, fontSize: 13 }}>
+            {serverError}
+          </div>
+        )}
+        {!serverLoading && !serverError && serverIps.length === 0 && (
+          <div style={{ opacity: 0.6, fontSize: 13 }}>아직 조회된 정보가 없습니다. 위 버튼으로 조회해 보세요.</div>
+        )}
+        {serverIps.length > 0 && (
+          <div style={{ maxHeight: 220, overflow: "auto", background: "#020617", padding: 10, borderRadius: 8 }}>
+            {serverIps.map((iface) => (
+              <div
+                key={iface.ifname || iface.ifindex}
+                style={{ padding: "6px 8px", borderBottom: "1px solid rgba(148,163,184,0.2)" }}
+              >
+                <div style={{ fontWeight: 600 }}>
+                  {iface.ifname} ({iface.operstate})
+                </div>
+                <div style={{ fontSize: 13, opacity: 0.8 }}>
+                  MAC: {iface.address || "-"}
+                </div>
+                <div style={{ marginTop: 4, fontSize: 13 }}>
+                  {iface.addr_info?.map((a, idx) => (
+                    <div key={idx}>
+                      {a.family} {a.local}/{a.prefixlen} {a.scope && `(${a.scope})`}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div style={{ marginTop: 16 }}>
+        <h4>서버 접속 IP 로그 (리눅스 ss -ntp)</h4>
+        {connectionsRaw ? (
+          <pre
+            style={{
+              maxHeight: 220,
+              overflow: "auto",
+              background: "#020617",
+              padding: 10,
+              borderRadius: 8,
+              fontSize: 12,
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            {connectionsRaw}
+          </pre>
+        ) : (
+          <div style={{ opacity: 0.6, fontSize: 13 }}>아직 접속 정보가 없습니다. 위 버튼으로 조회해 보세요.</div>
+        )}
       </div>
 
       <div className="table-wrap" style={{ marginTop: 12 }}>
