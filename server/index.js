@@ -1,6 +1,4 @@
-// 간단한 Node.js + Express 백엔드
-// 리눅스(Rocky)에서 실행해서 서버 IP/네트워크 상태와 접속 IP 목록을 조회하는 API
-
+// 리눅스 서버용 IP 추출 API 서버
 import express from "express";
 import cors from "cors";
 import { exec } from "child_process";
@@ -9,37 +7,45 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 1) 서버의 IP/인터페이스 정보 조회 (리눅스 ip 명령 사용)
-app.get("/api/server-ip", (req, res) => {
-  exec("ip -j addr", (err, stdout) => {
+// 리눅스의 'ip a' 명령어 결과에서 실제 IP만 추출하는 API
+app.get("/api/ip", (req, res) => {
+  // ip a 명령어 실행
+  exec("ip a", (err, stdout, stderr) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ error: "ip 명령 실행 실패", detail: String(err) });
+      return res.status(500).json({ error: "명령어 실행 실패", detail: String(err) });
     }
-    try {
-      const data = JSON.parse(stdout);
-      res.json(data);
-    } catch (e) {
-      console.error(e);
-      res.status(500).json({ error: "ip 결과 파싱 실패", raw: stdout });
+
+    // inet 뒤의 IPv4 주소를 찾는 정규표현식
+    const ipRegex = /inet\s+(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/g;
+    let match;
+    const ips = [];
+
+    while ((match = ipRegex.exec(stdout)) !== null) {
+      const ip = match[1];
+      // 127.0.0.1 (루프백)은 제외
+      if (ip !== "127.0.0.1") {
+        ips.push(ip);
+      }
     }
+
+    if (ips.length === 0) {
+      return res.status(404).json({ 
+        error: "실제 IP 주소를 찾지 못했습니다.", 
+        raw: stdout 
+      });
+    }
+
+    // 첫 번째 실제 IP 반환
+    res.json({
+      ip: ips[0],
+      all_ips: ips,
+      raw: stdout
+    });
   });
 });
 
-// 2) 현재 TCP 연결 목록 조회 (접속 IP 확인용)
-app.get("/api/connections", (req, res) => {
-  exec("ss -ntp", (err, stdout) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: "ss 명령 실행 실패", detail: String(err) });
-    }
-    res.json({ raw: stdout });
-  });
-});
-
-const PORT = process.env.PORT || 4000;
+const PORT = 4000;
 app.listen(PORT, () => {
-  console.log(`Backend server listening on port ${PORT}`);
+  console.log(`🚀 Network Info Server running on port ${PORT}`);
 });
-
-
